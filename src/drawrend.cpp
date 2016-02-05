@@ -438,7 +438,48 @@ void DrawRend::rasterize_line( float x0, float y0,
                      Color color) {
 
   // Part 1: Fill this in
+  int dx = (int)abs(x1-x0), sx = x0 < x1 ? 1 : -1;
+  int dy = -(int)abs(y1-y0), sy = y0 < y1 ? 1 : -1;
+  int err = dx+dy, e2;
+  int x = x0, y = y0;
 
+  /*
+  cout << x0 << "," << y0 << "; " << x1 << "," << y1;
+  bool first = true;
+  */
+
+  while (1) {
+    rasterize_point((float)x, (float)y, color);
+    e2 = 2*err;
+    if (e2 >= dy) {
+      err += dy;
+      x += sx;
+    }
+    if (e2 <= dx) {
+      err += dx;
+      y += sy;
+    }
+
+    /*
+    if (first) {
+      cout << ", first point: " << x << "," << y;
+      first = false;
+    } else {
+      cout << endl << x << "," << y << ", e=" << e2;
+    }
+    */
+
+    if ((x0 <= x1 && y0 <= y1 && x >= (int)x1 && y >= (int)y1) ||
+         (x0 > x1 && y0 <= y1 && x < (int)x1 && y >= (int)y1) ||
+         (x0 <= x1 && y0 > y1 && x >= (int)x1 && y < (int)y1) ||
+         (x0 > x1 && y0 > y1 && x < (int)x1 && y < (int)y1)) {
+      /*
+      cout << ", last point: " << x << "," << y;
+      cout << " => done" << endl;
+      */
+      break;
+    }
+  }
 }
 
   // rasterize a triangle
